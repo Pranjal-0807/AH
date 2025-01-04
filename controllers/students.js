@@ -4,7 +4,7 @@ const Club = require("../models/clubs");
 
 exports.getAllStudents = async (req, res) => {
   try {
-    const students = await Student.find().populate("profile club");
+    const students = await Student.find().populate("profile");
     res.status(201).json(students);
   } catch (err) {
     res.status(500).json({ message: "Unable to open file on server" });
@@ -14,7 +14,8 @@ exports.getAllStudents = async (req, res) => {
 exports.getStudentById = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id).populate("profile");
-    res.json(student);
+    const currentGpa = student.currentGpa;
+    res.json({ student, currentGpa });
   } catch (err) {
     res.status(500).json({ message: "Unable to open file on server" });
   }
@@ -79,12 +80,19 @@ exports.createStudentProfile = async (req, res, next) => {
 
 exports.createStudentClubDetails = async (req, res, next) => {
   try {
-    const newClub = new Club(req.body);
-    const club = await newClub.save();
+    const club = await Club.findById(req.body._id);
     const student = await Student.findById(req.params.id);
-    student.club = club._id;
+    if (club.students.includes(student.id)) {
+      return res.status(400).json({ message: "Student Already registered!!!" });
+    }
+    club.students.push(student.id);
+    await club.save();
+    student.club.push({
+      _id: club._id,
+      name: club.name,
+    });
     const ack = await student.save();
-    res.json(student);
+    res.json(ack);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: err.message });

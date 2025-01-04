@@ -6,6 +6,10 @@ const ClubSchema = mongoose.Schema({
     required: true,
   },
   description: String,
+  students: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Student",
+  },
 });
 
 module.exports = mongoose.model("Club", ClubSchema);

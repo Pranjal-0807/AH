@@ -13,22 +13,7 @@ exports.getAllClubs = async (req, res) => {
 exports.getClubById = async (req, res) => {
   try {
     const club = await Club.findById(req.params.id);
-    // const students = await Student.find({ club: club._id });
-    // Or
-    // const students = await Student.where("club").in(club._id);
-    // const students = await Student.find({ club: { $in: [] } });
-    // const students = await Student.find({ club: club._id }).populate("profile");
-    // const students = await Student.where("club")
-    //   .in(club._id)
-    //   .select("-grades -gpa -courses")
-    //   .populate("profile");
-    // Or
-    //Projection method
-    const students = await Student.find(
-      { club: club._id },
-      { grades: 0, gpa: 0, courses: 0 }
-    ).populate("profile");
-    res.json({ club, students });
+    res.json(club);
   } catch (err) {
     res.status(500).json({ message: "Unable to open file on server" });
   }
